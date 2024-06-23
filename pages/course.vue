@@ -32,12 +32,24 @@
     </div>
     </div>
     <div class="prose p-12 bg-white rounded-md w-[65ch]">
+      <NuxtErrorBoundary>
         <NuxtPage />
+        <template #error="{ error }">
+        <p>
+          Oh no, have error
+         <code>{{ error }}</code>
+        </p>
+        <button @click="resetError">Reset</button>
+        </template>
+      </NuxtErrorBoundary>
     </div>
   </div>
 </template>
 <script setup>
     const {chapters} = useCourse();
+    const resetError = async () => {
+      throw createError({fatal: true, statusMessage: "Not found", statusCode: 404}); // Fatal error screen and + error outside NuxtErrorBoundary
+    }
 </script>
 <style scoped>
 .router-link-active {

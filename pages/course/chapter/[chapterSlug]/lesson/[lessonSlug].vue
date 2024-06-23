@@ -32,11 +32,23 @@
 const course = useCourse();
 const route = useRoute();
 const chapter = computed(() => {
-        return course.chapters.find(c => c.slug === route.params.chapterSlug);
+  return course.chapters.find(c => c.slug === route.params.chapterSlug);
 })
+if (!chapter.value) {
+  throw createError({
+    message: "Chapter not found",
+    statusCode: 404,
+  })
+}
 const lesson = computed(() => {
-        return chapter.value.lessons.find(l => l.slug === route.params.lessonSlug)
+  return chapter.value.lessons.find(l => l.slug === route.params.lessonSlug)
 })
+if (!lesson.value) {
+  throw createError({
+    message: "Lesson not found",
+    statusCode: 404,
+  })
+}
 const title = computed(() => {
   return `${lesson.value.title} - ${course.title}`
 })
@@ -53,7 +65,8 @@ const isLessonComplete = computed(() => {
   }
   return progress.value[chapter.value.number - 1][lesson.value.number - 1];
 })
-const toggleComplete = () => {
+const toggleComplete = async () => {
+  throw createError("Have some lesson error");
   if (!progress.value[chapter.value.number - 1]) {
     progress.value[chapter.value.number - 1] = [];
   }
