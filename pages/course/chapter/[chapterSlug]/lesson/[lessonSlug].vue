@@ -35,27 +35,30 @@ const chapter = computed(() => {
   return course.chapters.find(c => c.slug === route.params.chapterSlug);
 })
 definePageMeta({
-  validate (route) {
+  middleware: function({params}, from) {
     const course = useCourse();
     const chapter = computed(() => {
-      return course.chapters.find(c => c.slug === route.params.chapterSlug);
+      return course.chapters.find(c => c.slug === params.chapterSlug);
     })
     if (!chapter.value) {
-      throw createError({
-        message: "Chapter not found",
-        statusCode: 404,
-      })
+      return abortNavigation(
+        createError({
+          message: "Chapter not found",
+          statusCode: 404,
+        })
+      )
     }
     const lesson = computed(() => {
-      return chapter.value.lessons.find(l => l.slug === route.params.lessonSlug)
+      return chapter.value.lessons.find(l => l.slug === params.lessonSlug)
     })
     if (!lesson.value) {
-      throw createError({
-        message: "Lesson not found",
-        statusCode: 404,
-      })
+      return abortNavigation(
+        createError({
+          message: "Lesson not found",
+          statusCode: 404,
+        })
+      )
     }
-    return true;
   }
 })
 const lesson = computed(() => {
