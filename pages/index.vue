@@ -1,8 +1,9 @@
 <template>
-    Hello world !!
+  <NuxtLink class="underline font-medium" :href="firstLesson.path">
+    Go to first lesson
+  </NuxtLink>
 </template>
-<script>
-definePageMeta({
-    layout: false,
-})
+<script setup lang="ts">
+  const firstLesson = useFirstLesson();
+  console.log("HAVE first lesson", firstLesson);
 </script>
