@@ -4,6 +4,6 @@
   </NuxtLink>
 </template>
 <script setup lang="ts">
-  const firstLesson = useFirstLesson();
+  const firstLesson = await useFirstLesson();
   console.log("HAVE first lesson", firstLesson);
 </script>

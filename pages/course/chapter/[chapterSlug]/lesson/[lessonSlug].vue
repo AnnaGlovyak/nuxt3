@@ -26,19 +26,23 @@
   </div>
 </template>
 <script setup>
-  const course = useCourse();
+  const course = await useCourse();
   const route = useRoute();
   const { chapterSlug, lessonSlug } = route.params;
   const lesson = await useLesson(chapterSlug, lessonSlug);
   const chapter = computed(() => {
-    return course.chapters.find((c) => c.slug === route.params.chapterSlug);
+    return course.value.chapters.find(
+      (c) => c.slug === route.params.chapterSlug
+    );
   });
   definePageMeta({
     middleware: [
-      function ({ params }, from) {
-        const course = useCourse();
+      async function ({ params }, from) {
+        const course = await useCourse();
         const chapter = computed(() => {
-          return course.chapters.find((c) => c.slug === params.chapterSlug);
+          return course.value.chapters.find(
+            (c) => c.slug === params.chapterSlug
+          );
         });
         if (!chapter.value) {
           return abortNavigation(
@@ -66,7 +70,7 @@
     ],
   });
   const title = computed(() => {
-    return `${lesson.value.title} - ${course.title}`;
+    return `${lesson.value.title} - ${course.value.title}`;
   });
   useHead({
     title,
