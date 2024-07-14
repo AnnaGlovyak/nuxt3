@@ -36,38 +36,7 @@
     );
   });
   definePageMeta({
-    middleware: [
-      async function ({ params }, from) {
-        const course = await useCourse();
-        const chapter = computed(() => {
-          return course.value.chapters.find(
-            (c) => c.slug === params.chapterSlug
-          );
-        });
-        if (!chapter.value) {
-          return abortNavigation(
-            createError({
-              message: "Chapter not found",
-              statusCode: 404,
-            })
-          );
-        }
-        const lesson = computed(() => {
-          return chapter.value.lessons.find(
-            (l) => l.slug === params.lessonSlug
-          );
-        });
-        if (!lesson.value) {
-          return abortNavigation(
-            createError({
-              message: "Lesson not found",
-              statusCode: 404,
-            })
-          );
-        }
-      },
-      "auth",
-    ],
+    middleware: ["auth"],
   });
   const title = computed(() => {
     return `${lesson.value.title} - ${course.value.title}`;

@@ -24,7 +24,7 @@
   // });
 
   const login = async () => {
-    const redirectTo = `${window.location.origin}${query.redirectTo}`;
+    const redirectTo = `${query.redirectTo}`;
     console.log("HAVE redirectTo", redirectTo);
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: "github",
