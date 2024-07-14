@@ -1,40 +1,37 @@
-import courseData from "~/server/routes/api/courseData";
-import type {
-  Lesson,
-  Chapter,
-  Course,
-  CourseMeta,
-  OutlineChapter,
-  OutlineLesson,
-} from "~/types/course";
+import { PrismaClient, Prisma } from "@prisma/client";
 
-courseData as Course;
+const prisma = new PrismaClient();
 
-export default defineEventHandler((event): CourseMeta => {
-  const outline: OutlineChapter[] = courseData.chapters.reduce(
-    (acc: OutlineChapter[], cur: Chapter) => {
-      const lessons: OutlineLesson[] = cur.lessons.map((l: Lesson) => {
-        return {
-          title: l.title,
-          slug: l.slug,
-          number: l.number,
-          path: `/course/chapter/${cur.slug}/lesson/${l.slug}`,
-        };
-      });
-      const chapter: OutlineChapter = {
-        title: cur.title,
-        slug: cur.slug,
-        number: cur.number,
-        lessons,
-      };
-      acc.push(chapter);
-      return acc;
-    },
-    []
-  );
+const LessonSelect = Prisma.validator<Prisma.LessonDefaultArgs>()({
+  select: {
+    title: true,
+    number: true,
+    slug: true,
+  },
+});
 
-  return {
-    title: courseData.title,
-    chapters: outline,
-  };
+type LessonOutLine = Prisma.LessonGetPayload<typeof LessonSelect>;
+
+const ChapterSelect = Prisma.validator<Prisma.ChapterDefaultArgs>()({
+  select: {
+    title: true,
+    number: true,
+    slug: true,
+    lessons: LessonSelect,
+  },
+});
+
+export type ChapterOutline = Prisma.ChapterGetPayload<typeof ChapterSelect>;
+
+const CourseSelect = Prisma.validator<Prisma.CourseDefaultArgs>()({
+  select: {
+    title: true,
+    chapters: ChapterSelect,
+  },
+});
+
+export type CourseOutline = Prisma.CourseGetPayload<typeof CourseSelect>;
+
+export default defineEventHandler(async (event) => {
+  return prisma.course.findFirst(CourseSelect);
 });
