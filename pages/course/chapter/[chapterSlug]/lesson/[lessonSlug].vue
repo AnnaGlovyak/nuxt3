@@ -21,15 +21,27 @@
     <VideoPlayer :videoId="lesson.videoId" />
     <p>{{ lesson.text }}</p>
     <LessonCompleteButton
-      :model-value="isLessonComplete"
+      v-if="user"
+      :model-value="isCompleted"
       @update:modelValue="toggleComplete" />
   </div>
 </template>
 <script setup>
-  const course = await useCourse();
+  import { useCourseProgress } from "~/stores/courseProgress";
   const route = useRoute();
   const { chapterSlug, lessonSlug } = route.params;
+  const user = useSupabaseUser();
+
+  const name = computed(() => user.value?.user_metadata.full_name);
+  const profile = computed(() => user.value?.user_metadata.avatar_url);
+
+  const course = await useCourse();
   const lesson = await useLesson(chapterSlug, lessonSlug);
+  const store = useCourseProgress();
+  const { toggleComplete, initialize } = store;
+
+  initialize();
+
   const chapter = computed(() => {
     return course.value.chapters.find(
       (c) => c.slug === route.params.chapterSlug
@@ -39,28 +51,12 @@
     middleware: ["auth"],
   });
   const title = computed(() => {
-    return `${lesson.value.title} - ${course.value.title}`;
+    return `${lesson?.value.title} - ${course?.value.title}`;
+  });
+  const isCompleted = computed(() => {
+    return store.progress?.[chapterSlug]?.[lessonSlug] || false;
   });
   useHead({
     title,
   });
-  const progress = useLocalStorage("progress", []);
-  const isLessonComplete = computed(() => {
-    if (!progress.value[chapter.value.number - 1]) {
-      return false;
-    }
-    if (!progress.value[chapter.value.number - 1][lesson.value.number - 1]) {
-      return false;
-    }
-    return progress.value[chapter.value.number - 1][lesson.value.number - 1];
-  });
-  const toggleComplete = async () => {
-    throw createError("Have some lesson error");
-    if (!progress.value[chapter.value.number - 1]) {
-      progress.value[chapter.value.number - 1] = [];
-    }
-
-    progress.value[chapter.value.number - 1][lesson.value.number - 1] =
-      !isLessonComplete.value;
-  };
 </script>
