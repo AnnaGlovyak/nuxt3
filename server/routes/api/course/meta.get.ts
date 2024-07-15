@@ -10,7 +10,7 @@ const LessonSelect = Prisma.validator<Prisma.LessonDefaultArgs>()({
   },
 });
 
-type LessonOutLine = Prisma.LessonGetPayload<typeof LessonSelect> & {
+export type LessonOutLine = Prisma.LessonGetPayload<typeof LessonSelect> & {
   path: string;
 };
 
