@@ -9,14 +9,14 @@ const prisma = new PrismaClient();
 const STRIPE_WEBHOOK_SECRET = useRuntimeConfig().stripeWebhookSecret;
 
 export default defineEventHandler(async (event) => {
-  const signature = getHeader(event, "stripe-signature");
+  //   const signature = getHeader(event, "stripe-signature");
   const body = await readRawBody(event);
 
   // Signature for webhook testing
-  //   const signature = stripe.webhooks.generateTestHeaderString({
-  //     payload: body,
-  //     secret: STRIPE_WEBHOOK_SECRET,
-  //   });
+  const signature = stripe.webhooks.generateTestHeaderString({
+    payload: body,
+    secret: STRIPE_WEBHOOK_SECRET,
+  });
 
   // Verify the webhook signature
   let stripeEvent;
